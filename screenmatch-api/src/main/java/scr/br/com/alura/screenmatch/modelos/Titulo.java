@@ -1,6 +1,5 @@
 package scr.br.com.alura.screenmatch.modelos;
 
-import com.google.gson.annotations.SerializedName;
 
 public class Titulo implements Comparable<Titulo> {
 	
@@ -23,9 +22,18 @@ public class Titulo implements Comparable<Titulo> {
     }
 
     public Titulo(TituloOmdb meuTitulo) {
-		this.nome=meuTitulo.title();
-		this.anoDeLancamento=Integer.valueOf(meuTitulo.year());
-		this.duracaoEmMinutos=Integer.valueOf(meuTitulo.runtime().substring(0,3));
+		this.nome=meuTitulo.getNome();
+		
+		if(meuTitulo.getAnoLancamento().length() > 4)
+			meuTitulo.setAnoLancamento(meuTitulo.getAnoLancamento().substring(0,3));
+			
+		this.anoDeLancamento=Integer.valueOf(meuTitulo.getAnoLancamento());
+		
+		//se a duração do json vinher como N/A automaticamente é setada como 0 
+		if(meuTitulo.getDuracaoEmMinutos().equals("N/A"))
+			this.duracaoEmMinutos=0;
+		else
+			this.duracaoEmMinutos=Integer.valueOf(meuTitulo.getDuracaoEmMinutos().substring(0,3).replace(" ","" ));
 
 	}
 
