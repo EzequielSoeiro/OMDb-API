@@ -1,67 +1,48 @@
 package scr.br.com.alura.screenmatch.principal;
 
-import  scr.br.com.alura.screenmatch.calculos.FiltroRecomendacao;
-import  scr.br.com.alura.screenmatch.modelos.Episodio;
-import  scr.br.com.alura.screenmatch.modelos.Filme;
-import  scr.br.com.alura.screenmatch.modelos.Serie;
-import  scr.br.com.alura.screenmatch.calculos.CalculadoraDeTempo;
-
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Scanner;
 
-public class Principal {
-    public static void main(String[] args) {
-        Filme meuFilme = new Filme("O poderoso chefão", 1970);
-        meuFilme.setDuracaoEmMinutos(180);
-        System.out.println("Duração do filme: " + meuFilme.getDuracaoEmMinutos());
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-        meuFilme.exibeFichaTecnica();
-        meuFilme.avalia(8);
-        meuFilme.avalia(5);
-        meuFilme.avalia(10);
-        System.out.println("Total de avaliações: " + meuFilme.getTotalDeAvaliacoes());
-        System.out.println(meuFilme.pegaMedia());
-        //meuFilme.somaDasAvaliacoes = 10;
-        //meuFilme.totalDeAvaliacoes = 1;
-        //System.out.println(meuFilme.pegaMedia());
+import scr.br.com.alura.screenmatch.modelos.Titulo;
+import scr.br.com.alura.screenmatch.modelos.TituloOmdb;
+import scr.br.com.alura.screenmatch.requisicao.requisicaoApi;
 
-        Serie lost = new Serie("Lost", 2000);
-        lost.exibeFichaTecnica();
-        lost.setTemporadas(10);
-        lost.setEpisodiosPorTemporada(10);
-        lost.setMinutosPorEpisodio(50);
-        System.out.println("Duração para maratonar Lost: " + lost.getDuracaoEmMinutos());
+public class PrincipalComBusca {
+    public static void main(String[] args) throws IOException, InterruptedException {
+    	
+        Scanner leitura = new Scanner(System.in);
+        ArrayList<Titulo> titulos = new ArrayList<Titulo>();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		String busca = "";
 
-        Filme outroFilme = new Filme("Avatar", 2023);
-        outroFilme.setDuracaoEmMinutos(200);
+        
+        for(int i=0; i<5; i++) {
+        System.out.println("\nDigite um filme para busca: ");
+        busca = leitura.nextLine();
+        
+        if(busca.equalsIgnoreCase("sair"))
+        	break;
 
-        CalculadoraDeTempo calculadora = new CalculadoraDeTempo();
-        calculadora.inclui(meuFilme);
-        calculadora.inclui(outroFilme);
-        calculadora.inclui(lost);
-        System.out.println(calculadora.getTempoTotal());
-
-        FiltroRecomendacao filtro = new FiltroRecomendacao();
-        filtro.filtra(meuFilme);
-
-        Episodio episodio = new Episodio();
-        episodio.setNumero(1);
-        episodio.setSerie(lost);
-        episodio.setTotalVisualizacoes(300);
-        filtro.filtra(episodio);
-
-        var filmeDoPaulo = new Filme("Dogville", 2003);
-        filmeDoPaulo.setDuracaoEmMinutos(200);
-        filmeDoPaulo.avalia(10);
-
-        ArrayList<Filme> listaDeFilmes = new ArrayList<>();
-        listaDeFilmes.add(filmeDoPaulo);
-        listaDeFilmes.add(meuFilme);
-        listaDeFilmes.add(outroFilme);
-        System.out.println("Tamanho da lista " + listaDeFilmes.size());
-        System.out.println("Primeiro filme " + listaDeFilmes.get(0).getNome());
-        System.out.println(listaDeFilmes);
-        System.out.println("toString do filme " + listaDeFilmes.get(0).toString());
-
-
-    }
+        requisicaoApi requisicao = new requisicaoApi(busca);
+        TituloOmdb meuTitulo = requisicao.realizaRequisicao(gson);
+        Titulo titulo = new Titulo(meuTitulo);
+        
+        titulos.add(titulo);
+  
+    } 
+        System.out.println(titulos);
+        FileWriter arquivoJson = new FileWriter("filmes.json");
+        arquivoJson.write(gson.toJson(titulos));
+        arquivoJson.close();
+  }
 }
