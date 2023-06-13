@@ -17,7 +17,7 @@ import scr.br.com.alura.screenmatch.modelos.Titulo;
 import scr.br.com.alura.screenmatch.modelos.TituloOmdb;
 import scr.br.com.alura.screenmatch.requisicao.requisicaoApi;
 
-public class PrincipalComBusca {
+public class Principal {
     public static void main(String[] args) throws IOException, InterruptedException {
     	
         Scanner leitura = new Scanner(System.in);
